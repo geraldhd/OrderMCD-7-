@@ -16,11 +16,18 @@ public class Dashboard extends javax.swing.JFrame {
     private double total = 0.0;
     private int x =0;
     private double tax = 0.0;
+    private int userId;
+    
     public Dashboard() {
         initComponents();
         init();
     }
-
+    
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+    
+    
     public void init(){
         setImage();
         seTime();
@@ -1944,20 +1951,40 @@ public class Dashboard extends javax.swing.JFrame {
         }
     }
     private void btnTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTotalActionPerformed
-        if(total==0.0){
-            JOptionPane.showMessageDialog(null, "Silahkan Memesan telebih dahulu");
-        }else{
-            jTextArea.setText(jTextArea.getText()
-            +"\n==================================\n"
-            +"Tax: \t\t\t"+tax+"\n"
-            +"SubTotal: \t\t\t"+total+"\n"
-            +"Total: \t\t\t"+(total+tax)+"\n\n"
-            +"==============DONE================");
-            
-            btnTotal.setEnabled(false);
-        }
+        if(total == 0.0) {
+        JOptionPane.showMessageDialog(null, "Silahkan Memesan telebih dahulu");
+    } else {
+        double grandTotal = total + tax;
+
+        jTextArea.setText(jTextArea.getText()
+                + "\n==================================\n"
+                + "Tax: \t\t\t" + tax + "\n"
+                + "SubTotal: \t\t\t" + total + "\n"
+                + "Total: \t\t\t" + grandTotal + "\n\n"
+                + "==============DONE================");
+
+        btnTotal.setEnabled(false);
+
+        // Save the total to the database
+        saveTotalToDatabase(grandTotal);
+    }
     }//GEN-LAST:event_btnTotalActionPerformed
 
+    private void saveTotalToDatabase(double grandTotal) {
+    try {
+        // Call the savePesanan method with appropriate parameters
+        int intTotal = (int) grandTotal;
+        int id_pelanggan = this.userId;
+        DatabaseManager.savePesanan(id_pelanggan, intTotal);
+
+        JOptionPane.showMessageDialog(null, "Total berhasil disimpan ke database");
+
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menyimpan total ke database: " + ex.getMessage());
+    }
+    }
+    
     public void dudate(){
         jTextFieldTax.setText(String.valueOf(tax));
         jTextFieldSubTotal.setText(String.valueOf(total));
@@ -2057,11 +2084,15 @@ public class Dashboard extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Dashboard().setVisible(true);
-            }
-        });
+
+        SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+            JOptionPane.showMessageDialog(null, "Login berhasil");
+            new Dashboard().setVisible(true);
+        }
+    });
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -2220,4 +2251,6 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JLabel jTxtDate;
     private javax.swing.JLabel jTxtime;
     // End of variables declaration//GEN-END:variables
+
+    
 }

@@ -1,3 +1,5 @@
+package mcd;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -7,15 +9,15 @@ import java.sql.SQLException;
 public class DatabaseManager {
 
     // JDBC URL, username, and password of MySQL server
-    private static final String URL = "jdbc:mysql://localhost:3306/order_mcd";
-    private static final String USER = "your_username";
-    private static final String PASSWORD = "your_password";
+    private static final String URL = "jdbc:mysql://localhost:3306/mcd";
+    private static final String USER = "root";
+    private static final String PASSWORD = "";
 
     // JDBC variables for opening, closing, and managing connection
     private static Connection connection;
 
     // Method to configure and return a database connection
-    private static Connection configDB() throws SQLException {
+    static Connection configDB() throws SQLException {
         if (connection == null || connection.isClosed()) {
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
@@ -28,19 +30,19 @@ public class DatabaseManager {
     }
 
     // Method to close the database connection
-    private static void closeConnection() throws SQLException {
+    static void closeConnection() throws SQLException {
         if (connection != null && !connection.isClosed()) {
             connection.close();
         }
     }
 
     // Metode untuk menyimpan pesanan
-    public static void savePesanan(int idPesanan, int totalHarga) {
+    public static void savePesanan(int id_pelanggan, int totalHarga) {
         try {
             Connection conn = configDB();
-            String sql = "INSERT INTO pesanan (id_pesanan, total_harga) VALUES (?, ?)";
+            String sql = "INSERT INTO pesanan (id_pelanggan,total_harga) VALUES (?, ?)";
             try (PreparedStatement pst = conn.prepareStatement(sql)) {
-                pst.setInt(1, idPesanan);
+                pst.setInt(1, id_pelanggan);
                 pst.setInt(2, totalHarga);
                 pst.executeUpdate();
             }
@@ -71,13 +73,12 @@ public class DatabaseManager {
     }
 
     // Metode untuk menyimpan data user
-    public static void saveUser(int id, String nama) {
+    public static void saveUser(String nama) {
         try {
             Connection conn = configDB();
-            String sql = "INSERT INTO user (id, nama) VALUES (?, ?)";
+            String sql = "INSERT INTO user (nama) VALUES ( ?)";
             try (PreparedStatement pst = conn.prepareStatement(sql)) {
-                pst.setInt(1, id);
-                pst.setString(2, nama);
+                pst.setString(2,nama);
                 pst.executeUpdate();
             }
             closeConnection();
@@ -111,7 +112,7 @@ public class DatabaseManager {
         savePesanan(1, 100);
         getAllPesanan();
 
-        saveUser(1, "John Doe");
+        saveUser("John Doe");
         getAllUser();
     }
 }
